@@ -3,7 +3,7 @@ variables:
   MSBUILD_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe'
   DEPLOY_FOLDER: '$CI_PROJECT_DIR\bin\Release\Publish\_PublishedWebsites\TestWebApplication'
   ARTIFACT_FOLDER: '$CI_PROJECT_DIR\ARTIFACT'
-  UNZIPPED_ARTIFACT_FOLDER: '$CI_PROJECT_DIR\ARTIFACT\UNZIPPED-$CI_COMMIT_SHA'
+  UNZIPPED_ARTIFACT_FOLDER: '$CI_PROJECT_DIR\ARTIFACT\UNZIPPED-$CI_COMMIT_SHORT_SHA'
   VSTEST_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow'
   UNITTEST_FOLDER: '$CI_PROJECT_DIR\..\TestWebApplication.Tests\bin\Release'
 
@@ -22,7 +22,7 @@ build_job:
     - '& "$env:MSBUILD_PATH" /p:Configuration=Release /clp:ErrorsOnly'
     - '& "$env:MSBUILD_PATH" $CI_PROJECT_DIR\TestWebApplication.csproj /p:DeployOnBuild=true /p:Configuration=Release /p:OutDir=$env:DEPLOY_FOLDER'
     - '& mkdir $env:ARTIFACT_FOLDER'
-    - '& Compress-Archive -Path "$env:DEPLOY_FOLDER\*" -DestinationPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHA.zip -Update'
+    - '& Compress-Archive -Path "$env:DEPLOY_FOLDER\*" -DestinationPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -Update'
   artifacts:
     expire_in: 2 days
     paths:
@@ -42,9 +42,9 @@ deploy_job:
   only:
     - branches
   script:
-    - 'Expand-Archive -LiteralPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHA.zip -DestinationPath $env:UNZIPPED_ARTIFACT_FOLDER'
+    - 'Expand-Archive -LiteralPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -DestinationPath $env:UNZIPPED_ARTIFACT_FOLDER'
     - 'Remove-Item –path C:\inetpub\wwwroot\MatrixMVCCrud\* –recurse -force'
-    - 'Copy-Item -Path "$env:UNZIPPED_ARTIFACT_FOLDER\*" -Destination "C:\inetpub\wwwroot\MatrixMVCCrud" -Recurse -Force'
+    - 'Copy-Item -Path "$env:UNZIPPED_ARTIFACT_FOLDER\_PublishedWebsites\TestWebApplication\*" -Destination "C:\inetpub\wwwroot\MatrixMVCCrud" -Recurse -Force'
   dependencies:
     - build_job
 #    - test_job
