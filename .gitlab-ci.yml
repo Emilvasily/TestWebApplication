@@ -9,8 +9,8 @@ variables:
 
 stages:
   - build
-  - test
-  - deploy
+#  - test
+#  - deploy
 
 build_job:
   stage: build
@@ -28,23 +28,23 @@ build_job:
     paths:
     - '$env:ARTIFACT_FOLDER'
 
-test_job:
-  stage: test
-  only:
-    - branches
-  script:
-    - '& "$env:VSTEST_PATH\vstest.console.exe" "$env:UNITTEST_FOLDER\TestWebApplication.Tests.dll"'
-  dependencies:
-    - build_job
+#test_job:
+#  stage: test
+#  only:
+#    - branches
+#  script:
+#    - '& "$env:VSTEST_PATH\vstest.console.exe" "$env:UNITTEST_FOLDER\TestWebApplication.Tests.dll"'
+#  dependencies:
+#    - build_job
 
-deploy_job:
-  stage: deploy
-  only:
-    - branches
-  script:
-    - 'Expand-Archive -LiteralPath $env:ARTIFACT_FOLDER\Draft.zip -DestinationPath $env:UNZIPPED_ARTIFACT_FOLDER'
-    - 'Remove-Item –path C:\inetpub\wwwroot\MatrixMVCCrud\* –recurse -force'
-    - 'Copy-Item -Path "$env:UNZIPPED_ARTIFACT_FOLDER\*" -Destination "C:\inetpub\wwwroot\MatrixMVCCrud" -Recurse -Force'
-  dependencies:
-    - build_job
-    - test_job
+#deploy_job:
+#  stage: deploy
+#  only:
+#    - branches
+#  script:
+#    - 'Expand-Archive -LiteralPath $env:ARTIFACT_FOLDER\Draft.zip -DestinationPath $env:UNZIPPED_ARTIFACT_FOLDER'
+#    - 'Remove-Item –path C:\inetpub\wwwroot\MatrixMVCCrud\* –recurse -force'
+#    - 'Copy-Item -Path "$env:UNZIPPED_ARTIFACT_FOLDER\*" -Destination "C:\inetpub\wwwroot\MatrixMVCCrud" -Recurse -Force'
+#  dependencies:
+#    - build_job
+#    - test_job
