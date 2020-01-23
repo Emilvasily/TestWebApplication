@@ -42,7 +42,7 @@ deploy_job:
   only:
     - branches
   script:
-    - 'Expand-Archive -LiteralPath $env:ARTIFACT_FOLDER\Draft.zip -DestinationPath $env:UNZIPPED_ARTIFACT_FOLDER'
+    - 'Expand-Archive -LiteralPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHA.zip -DestinationPath $env:UNZIPPED_ARTIFACT_FOLDER'
     - 'Remove-Item –path C:\inetpub\wwwroot\MatrixMVCCrud\* –recurse -force'
     - 'Copy-Item -Path "$env:UNZIPPED_ARTIFACT_FOLDER\*" -Destination "C:\inetpub\wwwroot\MatrixMVCCrud" -Recurse -Force'
   dependencies:
