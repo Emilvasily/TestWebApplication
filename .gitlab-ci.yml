@@ -9,7 +9,7 @@ variables:
 
 stages:
   - build
-#  - test
+  - test
   - deploy
 
 build_job:
@@ -28,14 +28,14 @@ build_job:
     paths:
     - '$env:ARTIFACT_FOLDER'
 
-#test_job:
-#  stage: test
-#  only:
-#    - branches
-#  script:
-#    - '& "$env:VSTEST_PATH\vstest.console.exe" "$env:UNITTEST_FOLDER\TestWebApplication.Tests.dll"'
-#  dependencies:
-#    - build_job
+test_job:
+  stage: test
+  only:
+    - branches
+  script:
+    - '& "$env:VSTEST_PATH\vstest.console.exe" "$env:UNITTEST_FOLDER\TestWebApplication.Tests.dll"'
+  dependencies:
+    - build_job
 
 deploy_job:
   stage: deploy
@@ -47,5 +47,5 @@ deploy_job:
     - 'Copy-Item -Path "$env:UNZIPPED_ARTIFACT_FOLDER\_PublishedWebsites\TestWebApplication\*" -Destination "C:\inetpub\wwwroot\MatrixMVCCrud" -Recurse -Force'
   dependencies:
     - build_job
-#    - test_job
+    - test_job
 #_PublishedWebsites\TestWebApplication
