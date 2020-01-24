@@ -47,7 +47,7 @@ deploy_job:
     - 'Expand-Archive -LiteralPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -DestinationPath $env:UNZIPPED_ARTIFACT_FOLDER'
     - 'Remove-Item –path C:\inetpub\wwwroot\MatrixMVCCrud\* –recurse -force'
     - 'Copy-Item -Path "$env:UNZIPPED_ARTIFACT_FOLDER\_PublishedWebsites\$CI_PROJECT_NAME\*" -Destination "C:\inetpub\wwwroot\MatrixMVCCrud" -Recurse -Force'
-    - 'C:\inetpub\wwwroot\siteRestart.ps1'
+    #- 'C:\inetpub\wwwroot\siteRestart.ps1'
   dependencies:
     - build_job
     - test_job
