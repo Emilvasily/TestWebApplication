@@ -22,6 +22,7 @@ build_job:
     - '& "$env:MSBUILD_PATH" /p:Configuration=Release /clp:ErrorsOnly'
     - '& "$env:MSBUILD_PATH" $CI_PROJECT_DIR\TestWebApplication.csproj /p:DeployOnBuild=true /p:Configuration=Release /p:OutDir=$env:DEPLOY_FOLDER'
     - '& mkdir $env:ARTIFACT_FOLDER'
+    - '& mkdir $env:$CI_PROJECT_DIR\$CI_PROJECT_NAME'
     - '& Compress-Archive -Path "$env:DEPLOY_FOLDER\*" -DestinationPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -Update'
   artifacts:
     expire_in: 2 days
