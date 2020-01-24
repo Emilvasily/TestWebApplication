@@ -6,7 +6,7 @@ variables:
   UNZIPPED_ARTIFACT_FOLDER: '$CI_PROJECT_DIR\ARTIFACT\UNZIPPED-$CI_COMMIT_SHORT_SHA'
   VSTEST_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow'
   UNITTEST_FOLDER: '$CI_PROJECT_DIR\..\TestWebApplication.Tests\bin\Release'
-  SOMETHING: '$CI_PROJECT_DIR'
+  SOMETHING: '$CI_PROJECT_DIR\$CI_PROJECT_NAME'
 
 stages:
   - build
@@ -23,13 +23,13 @@ build_job:
     - '& "$env:MSBUILD_PATH" /p:Configuration=Release /clp:ErrorsOnly'
     - '& "$env:MSBUILD_PATH" $CI_PROJECT_DIR\TestWebApplication.csproj /p:DeployOnBuild=true /p:Configuration=Release /p:OutDir=$env:DEPLOY_FOLDER'
     - '& mkdir $env:ARTIFACT_FOLDER'
-    - '& mkdir $env:SOMETHING\$CI_PROJECT_NAME'
+    - '& mkdir $env:SOMETHING'
     - '& Compress-Archive -Path "$env:DEPLOY_FOLDER\*" -DestinationPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -Update'
   artifacts:
     expire_in: 2 days
     paths:
     - '$env:ARTIFACT_FOLDER'
-
+    - '$env:SOMETHING'
 test_job:
   stage: test
   only:
