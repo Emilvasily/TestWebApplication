@@ -20,7 +20,7 @@ build_job:
   script:
     - '& "$env:NUGET_PATH" restore'
     - '& "$env:MSBUILD_PATH" /p:Configuration=Release /clp:ErrorsOnly'
-    - '& "$env:MSBUILD_PATH" $CI_PROJECT_DIR\$CI_PROJECT_NAME.csproj /p:DeployOnBuild=true /p:Configuration=Release /p:OutDir=$env:DEPLOY_FOLDER'
+    - '& "$env:MSBUILD_PATH" $CI_PROJECT_DIR\$CI_PROJECT_NAME.csproj /p:DeployOnBuild=true /p:Configuration=Release /p:OutDir=$env:DEPLOY_FOLDER /p:PrecompileBeforePublish=true;EnableUpdateable=false'
     - '& mkdir $env:ARTIFACT_FOLDER'
     - '& Compress-Archive -Path "$env:DEPLOY_FOLDER\*" -DestinationPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -Update' #archive everything from deploy folder with specified name
   artifacts:
@@ -42,7 +42,7 @@ deploy_job:
     - master
   script:
     - 'Expand-Archive -LiteralPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -DestinationPath $env:UNZIPPED_ARTIFACT_FOLDER' #unzip artifact to specified folder
-    #- 'Remove-Item –path C:\inetpub\wwwroot\MatrixMVCCrud\* –recurse -force'
+    - 'Remove-Item –path C:\Publish\* –recurse -force' #clean path before copy
     - 'Copy-Item -Path "$env:UNZIPPED_ARTIFACT_FOLDER\_PublishedWebsites\$CI_PROJECT_NAME\*" -Destination "C:\Publish" -Recurse -Force' #send uzipped artifact to final destination folder
     #- 'C:\inetpub\wwwroot\siteRestart.ps1'
   dependencies:
