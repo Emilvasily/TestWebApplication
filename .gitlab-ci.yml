@@ -20,7 +20,7 @@ build_job:
   script:
     - '& "$env:NUGET_PATH" restore'
     - '& "$env:MSBUILD_PATH" /p:Configuration=Release /clp:ErrorsOnly'
-    - '& "$env:MSBUILD_PATH" $CI_PROJECT_DIR\$CI_PROJECT_NAME.csproj /p:DeployOnBuild=true /p:Configuration=Release /p:OutDir=$env:DEPLOY_FOLDER /p:PrecompileBeforePublish=true;EnableUpdateable=false'
+    - '& "$env:MSBUILD_PATH" $CI_PROJECT_DIR\$CI_PROJECT_NAME.csproj /p:DeployOnBuild=true /p:Configuration=Release /p:OutDir=$env:DEPLOY_FOLDER /p:PrecompileBeforePublish=true /p:EnableUpdateable=false'
     - '& mkdir $env:ARTIFACT_FOLDER'
     - '& Compress-Archive -Path "$env:DEPLOY_FOLDER\*" -DestinationPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -Update' #archive everything from deploy folder with specified name
   artifacts:
