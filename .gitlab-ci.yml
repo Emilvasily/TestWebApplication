@@ -1,12 +1,11 @@
 variables:
-  NUGET_PATH: 'C:\Nuget\nuget.exe'
-  MSBUILD_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe'
-  DEPLOY_FOLDER: '$CI_PROJECT_DIR\bin\Release\Publish\_PublishedWebsites\$CI_PROJECT_NAME'
-  ARTIFACT_FOLDER: '$CI_PROJECT_DIR\ARTIFACT'
-  UNZIPPED_ARTIFACT_FOLDER: '$CI_PROJECT_DIR\ARTIFACT\UNZIPPED-$CI_COMMIT_SHORT_SHA'
-  VSTEST_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow'
-  UNITTEST_FOLDER: '$CI_PROJECT_DIR\..\$CI_PROJECT_NAME.Tests\bin\Release'
-#  SOMETHING: '$CI_PROJECT_DIR\$CI_PROJECT_NAME'
+  NUGET_PATH: 'C:\Nuget\nuget.exe' #Specified for runner
+  MSBUILD_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe' #Specified for runner
+  VSTEST_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow' #Specified for runner
+  UNITTEST_FOLDER: '$CI_PROJECT_DIR\..\$CI_PROJECT_NAME.Tests\bin\Release' #Folder with stored project tests
+  ARTIFACT_FOLDER: '$CI_PROJECT_DIR\ARTIFACT' #Folder for artifact inside project directory
+  UNZIPPED_ARTIFACT_FOLDER: '$CI_PROJECT_DIR\ARTIFACT\UNZIPPED-$CI_COMMIT_SHORT_SHA' #Folder for unzipped artifact inside project directory
+  DEPLOY_FOLDER: '$CI_PROJECT_DIR\bin\Release\Publish\_PublishedWebsites\$CI_PROJECT_NAME' #Folder with content which is ready for deployment
 
 stages:
   - build
@@ -23,19 +22,17 @@ build_job:
     - '& "$env:MSBUILD_PATH" /p:Configuration=Release /clp:ErrorsOnly'
     - '& "$env:MSBUILD_PATH" $CI_PROJECT_DIR\$CI_PROJECT_NAME.csproj /p:DeployOnBuild=true /p:Configuration=Release /p:OutDir=$env:DEPLOY_FOLDER'
     - '& mkdir $env:ARTIFACT_FOLDER'
-    #- '& mkdir $env:SOMETHING'
-    - '& Compress-Archive -Path "$env:DEPLOY_FOLDER\*" -DestinationPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -Update'
+    - '& Compress-Archive -Path "$env:DEPLOY_FOLDER\*" -DestinationPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -Update' #archive everything from deploy folder with specified name
   artifacts:
     expire_in: 2 days
     paths:
     - '$env:ARTIFACT_FOLDER'
-    #- '$env:SOMETHING'
 test_job:
   stage: test
   only:
     - master
   script:
-    - '& "$env:VSTEST_PATH\vstest.console.exe" "$env:UNITTEST_FOLDER\$CI_PROJECT_NAME.Tests.dll"'
+    - '& "$env:VSTEST_PATH\vstest.console.exe" "$env:UNITTEST_FOLDER\$CI_PROJECT_NAME.Tests.dll"' #nothing but tests
   dependencies:
     - build_job
 
@@ -44,11 +41,11 @@ deploy_job:
   only:
     - master
   script:
-    - 'Expand-Archive -LiteralPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -DestinationPath $env:UNZIPPED_ARTIFACT_FOLDER'
-    - 'Remove-Item –path C:\inetpub\wwwroot\MatrixMVCCrud\* –recurse -force'
-    - 'Copy-Item -Path "$env:UNZIPPED_ARTIFACT_FOLDER\_PublishedWebsites\$CI_PROJECT_NAME\*" -Destination "C:\inetpub\wwwroot\MatrixMVCCrud" -Recurse -Force'
+    - 'Expand-Archive -LiteralPath $env:ARTIFACT_FOLDER\commit-$CI_COMMIT_SHORT_SHA.zip -DestinationPath $env:UNZIPPED_ARTIFACT_FOLDER' #unzip artifact to specified folder
+    #- 'Remove-Item –path C:\inetpub\wwwroot\MatrixMVCCrud\* –recurse -force'
+    - 'Copy-Item -Path "$env:UNZIPPED_ARTIFACT_FOLDER\_PublishedWebsites\$CI_PROJECT_NAME\*" -Destination "C:\Publish" -Recurse -Force' #send uzipped artifact to final destination folder
     #- 'C:\inetpub\wwwroot\siteRestart.ps1'
   dependencies:
     - build_job
     - test_job
-#_PublishedWebsites\TestWebApplication
+
